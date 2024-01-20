@@ -1,0 +1,16 @@
+@import "./variables";
+
+.canvas {
+  position: absolute;
+  top: 80px;
+  width: 100%;
+  height: calc(100% - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+canvas {
+  background-color: white;
+  border: 1px solid $grey-color;
+}
