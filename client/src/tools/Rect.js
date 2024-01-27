@@ -1,14 +1,12 @@
 import Tool from "./Tool";
-import canvas from "../components/Canvas";
-
 export default class React extends Tool {
     isActive = false
     startX = null
     startY = null
     saved = null
 
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, socket, idSession, idUser) {
+        super(canvas, socket, idSession, idUser);
         this.listen()
     }
 
@@ -29,6 +27,20 @@ export default class React extends Tool {
 
     onMouseUpHandler(e) {
         this.isActive = false
+        const rect = e.target.getBoundingClientRect();
+
+        this.socket.send(JSON.stringify({
+            idUser: this.idUser,
+            idSession: this.idSession,
+            method: 'draw',
+            figure: {
+                type: 'rect',
+                x: this.startX,
+                y: this.startY,
+                width: e.clientX - rect.x - this.startX,
+                height: e.clientY - rect.y - this.startY,
+            }
+        }))
     }
 
     onMouseMoveHandler(e) {
@@ -39,11 +51,11 @@ export default class React extends Tool {
             const width = currentX - this.startX
             const height = currentY - this.startY
 
-            this.drawn(this.startX, this.startY, width, height)
+            this.draw(this.startX, this.startY, width, height)
         }
     }
 
-    drawn(x, y, width, height) {
+    draw(x, y, width, height) {
         const img = new Image()
         img.src = this.saved
 
@@ -56,5 +68,12 @@ export default class React extends Tool {
             this.ctx.fill()
             this.ctx.stroke()
         }
+    }
+
+    static draw(ctx, x, y, width, height) {
+        ctx.beginPath()
+        ctx.rect(x, y, width, height)
+        ctx.fill()
+        ctx.stroke()
     }
 }

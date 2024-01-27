@@ -6,8 +6,8 @@ export default class Circle extends Tool {
     startY = null
     saved = null
 
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, socket, idSession, idUser) {
+        super(canvas, socket, idSession, idUser);
         this.listen()
     }
 
@@ -30,6 +30,19 @@ export default class Circle extends Tool {
 
     onMouseUpHandler(e) {
         this.isActive = false
+        const rect = e.target.getBoundingClientRect()
+
+        this.socket.send(JSON.stringify({
+            idUser: this.idUser,
+            idSession: this.idSession,
+            method: 'draw',
+            figure: {
+                type: 'circle',
+                x: this.startX,
+                y: this.startY,
+                radius: Math.abs(e.clientX - rect.x - this.startX),
+            }
+        }))
     }
 
     onMouseMoveHandler(e) {
@@ -38,11 +51,11 @@ export default class Circle extends Tool {
             const currentX = e.clientX - rect.x
             const radius = Math.abs(currentX - this.startX)
 
-            this.drawn(this.startX, this.startY, radius)
+            this.draw(this.startX, this.startY, radius)
         }
     }
 
-    drawn(x, y, radius) {
+    draw(x, y, radius) {
         const img = new Image()
         img.src = this.saved
 
@@ -55,5 +68,12 @@ export default class Circle extends Tool {
             this.ctx.fill()
             this.ctx.stroke()
         }
+    }
+
+    static draw(ctx, x, y, radius) {
+        ctx.beginPath()
+        ctx.arc(x, y, radius, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
     }
 }

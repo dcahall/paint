@@ -4,16 +4,44 @@ class CanvasState {
     canvas = null
     undoList = []
     redoList = []
+    userName = ''
+    idSession = null
+    idUser = null
+    socket = null
 
     constructor() {
         makeObservable(this, {
             canvas: observable,
-            setCanvas: action
+            undoList: observable,
+            redoList: observable,
+            userName: observable,
+            socket: observable,
+            idSession: observable,
+            idUser: observable,
+            setCanvas: action,
+            pushToUndo: action,
+            pushToRedo: action,
+            setUserName: action,
+            undo: action,
+            redo: action
         })
     }
 
     setCanvas(canvas) {
         this.canvas = canvas
+    }
+
+    setIdUser(id) {
+        this.idUser = id
+    }
+
+    setSocket(socket) {
+        this.socket = socket
+    }
+
+
+    setIdSession(id) {
+        this.idSession = id
     }
 
     pushToUndo = (data) => {
@@ -22,6 +50,10 @@ class CanvasState {
 
     pushToRedo = (data) => {
         this.redoList.push(data)
+    }
+
+    setUserName = (name) => {
+        this.userName = name
     }
 
     undo() {
@@ -36,8 +68,7 @@ class CanvasState {
                 ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
                 ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height)
             }
-        }
-        else {
+        } else {
             ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
         }
     }

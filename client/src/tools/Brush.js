@@ -1,11 +1,10 @@
 import Tool from "./Tool";
-import canvas from "../components/Canvas";
 
 export default class Brush extends Tool {
     isActive = false
 
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, socket, idSession, idUser) {
+        super(canvas, socket, idSession, idUser);
         this.listen()
     }
 
@@ -21,6 +20,15 @@ export default class Brush extends Tool {
         const rect = e.target.getBoundingClientRect();
         this.ctx.beginPath()
         this.ctx.moveTo(e.clientX - rect.x, e.clientY - rect.y)
+
+        this.socket.send(JSON.stringify({
+            idUser: this.idUser,
+            idSession: this.idSession,
+            method: 'draw',
+            figure: {
+                type: 'started'
+            }
+        }))
     }
 
     onMouseUpHandler() {
@@ -30,12 +38,30 @@ export default class Brush extends Tool {
     onMouseMoveHandler(e) {
         if (this.isActive) {
             const rect = e.target.getBoundingClientRect();
-            this.drawn(e.clientX - rect.x, e.clientY - rect.y)
+            this.draw(e.clientX - rect.x, e.clientY - rect.y)
+
+
+            this.socket.send(JSON.stringify({
+
+                idUser: this.idUser,
+                idSession: this.idSession,
+                method: 'draw',
+                figure: {
+                    type: 'brush',
+                    x: e.clientX - rect.x,
+                    y: e.clientY - rect.y,
+                }
+            }))
         }
     }
 
-    drawn(x, y) {
+    draw(x, y) {
         this.ctx.lineTo(x, y)
         this.ctx.stroke()
+    }
+
+    static draw(ctx, x, y) {
+        ctx.lineTo(x, y)
+        ctx.stroke()
     }
 }

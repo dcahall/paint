@@ -6,8 +6,8 @@ export default class Line extends Tool {
     startY = null
     saved = null
 
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, socket, idSession, idUser) {
+        super(canvas, socket, idSession, idUser);
         this.listen()
     }
 
@@ -30,6 +30,20 @@ export default class Line extends Tool {
 
     onMouseUpHandler(e) {
         this.isActive = false
+        const rect = e.target.getBoundingClientRect();
+
+        this.socket.send(JSON.stringify({
+            idUser: this.idUser,
+            idSession: this.idSession,
+            method: 'draw',
+            figure: {
+                type: 'line',
+                startX: this.startX,
+                startY: this.startY,
+                x: e.clientX - rect.x,
+                y: e.clientY - rect.y
+            }
+        }))
     }
 
     onMouseMoveHandler(e) {
@@ -38,11 +52,11 @@ export default class Line extends Tool {
             const currentX = e.clientX - rect.x
             const currentY = e.clientY - rect.y
 
-            this.drawn(currentX, currentY)
+            this.draw(currentX, currentY)
         }
     }
 
-    drawn(x, y) {
+    draw(x, y) {
         const img = new Image()
         img.src = this.saved
 
@@ -55,5 +69,12 @@ export default class Line extends Tool {
             this.ctx.lineTo(x, y)
             this.ctx.stroke()
         }
+    }
+
+    static draw(ctx, startX, startY, x, y) {
+        ctx.beginPath()
+        ctx.moveTo(startX, startY)
+        ctx.lineTo(x, y)
+        ctx.stroke()
     }
 }

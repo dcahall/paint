@@ -1,29 +1,23 @@
 import '../styles/settingbar.scss'
 import React from 'react';
 
+import {ColorPicker, InputNumber, Typography} from "antd";
+
 import toolState from "../store/toolState";
 
 const SettingBar = () => {
     return (
         <div className='setting-bar'>
-            <label>Ширина линии
-                <input
-                    id='line_width'
-                    type='number'
-                    min={1}
-                    max={50}
-                    defaultValue={1}
-                    onChange={(e) => toolState.setLineWidth(e.target.value)}
-                />
-            </label>
-            <label>
-                Цвет обводки
-                <input
-                    id='stroke_color'
-                    type='color'
-                    onChange={(e) => toolState.setStrokeColor(e.target.value)}
-                />
-            </label>
+            <Typography>Ширина линии</Typography>
+            <InputNumber
+                size='small'
+                min={1}
+                max={50}
+                defaultValue={1}
+                onChange={(value) => toolState.setLineWidth(value)}
+            />
+            <Typography>Цвет обводки</Typography>
+                <ColorPicker defaultValue='black' onChange={(color) => toolState.setStrokeColor(color)}/>
         </div>
     );
 };
