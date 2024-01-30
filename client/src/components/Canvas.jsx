@@ -62,21 +62,25 @@ const Canvas = observer(() => {
     const drawHandler = (figure) => {
         const ctx = canvasRef.current.getContext('2d')
 
+        if (figure.type !== 'brush' || figure.type !== 'eraser') {
+            canvasState.pushToUndo(canvasState.canvas.toDataURL())
+        }
+
         switch (figure.type) {
             case 'brush':
-                Brush.draw(ctx, figure.x, figure.y)
+                Brush.draw(ctx, figure)
                 break
             case 'rect':
-                Rect.draw(ctx, figure.x, figure.y, figure.width, figure.height)
+                Rect.draw(ctx, figure)
                 break
             case 'circle':
-                Circle.draw(ctx, figure.x, figure.y, figure.radius)
+                Circle.draw(ctx, figure)
                 break
             case 'eraser':
-                Eraser.draw(ctx, figure.x, figure.y)
+                Eraser.draw(ctx, figure)
                 break
             case 'line':
-                Line.draw(ctx, figure.startX, figure.startY, figure.x, figure.y)
+                Line.draw(ctx, figure)
                 break;
             case 'started':
                 ctx.beginPath()
@@ -86,7 +90,7 @@ const Canvas = observer(() => {
 
     const onMouseDown = () => {
         canvasState.pushToUndo(canvasState.canvas.toDataURL())
-    }
+    } // Инкапсулировать в tools
 
     return (
         <div className='canvas'>

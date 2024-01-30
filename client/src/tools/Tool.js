@@ -26,6 +26,23 @@ export default class Tool {
         this.ctx.lineWidth = width
     }
 
+    static changeStyles(ctx, {lineWidth, strokeStyle, fillStyle}) {
+        const prevLineW = ctx.lineWidth
+        const prevStrokeStyle = ctx.strokeStyle
+        const prevFillStyle = ctx.fillStyle
+
+
+        ctx.lineWidth = lineWidth || prevLineW
+        ctx.strokeStyle = strokeStyle || prevStrokeStyle
+        ctx.fillStyle = fillStyle || prevFillStyle
+
+        return function undoChanges() {
+            ctx.lineWidth = prevLineW
+            ctx.strokeStyle = prevStrokeStyle
+            ctx.fillStyle = prevFillStyle
+        }
+    }
+
     destroyEventListiner() {
         this.canvas.onmousedown = null
         this.canvas.onmouseup = null

@@ -40,9 +40,7 @@ export default class Brush extends Tool {
             const rect = e.target.getBoundingClientRect();
             this.draw(e.clientX - rect.x, e.clientY - rect.y)
 
-
             this.socket.send(JSON.stringify({
-
                 idUser: this.idUser,
                 idSession: this.idSession,
                 method: 'draw',
@@ -50,6 +48,10 @@ export default class Brush extends Tool {
                     type: 'brush',
                     x: e.clientX - rect.x,
                     y: e.clientY - rect.y,
+                    styles: {
+                        lineWidth: this.ctx.lineWidth,
+                        strokeStyle: this.ctx.strokeStyle
+                    }
                 }
             }))
         }
@@ -60,8 +62,12 @@ export default class Brush extends Tool {
         this.ctx.stroke()
     }
 
-    static draw(ctx, x, y) {
+    static draw(ctx, {x, y, styles}) {
+        const undoChanges = Tool.changeStyles(ctx, styles)
+
         ctx.lineTo(x, y)
         ctx.stroke()
+
+        undoChanges()
     }
 }

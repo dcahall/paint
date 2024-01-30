@@ -41,6 +41,11 @@ export default class Circle extends Tool {
                 x: this.startX,
                 y: this.startY,
                 radius: Math.abs(e.clientX - rect.x - this.startX),
+                styles: {
+                    lineWidth: this.ctx.lineWidth,
+                    strokeStyle: this.ctx.strokeStyle,
+                    fillStyle: this.ctx.fillStyle
+                }
             }
         }))
     }
@@ -70,10 +75,14 @@ export default class Circle extends Tool {
         }
     }
 
-    static draw(ctx, x, y, radius) {
+    static draw(ctx, {x, y, radius, styles}) {
+        const undoChanges = Tool.changeStyles(ctx, styles)
+
         ctx.beginPath()
         ctx.arc(x, y, radius, 0, Math.PI * 2)
         ctx.fill()
         ctx.stroke()
+
+        undoChanges()
     }
 }

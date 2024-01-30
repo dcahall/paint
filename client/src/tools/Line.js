@@ -41,7 +41,12 @@ export default class Line extends Tool {
                 startX: this.startX,
                 startY: this.startY,
                 x: e.clientX - rect.x,
-                y: e.clientY - rect.y
+                y: e.clientY - rect.y,
+                styles: {
+                    lineWidth: this.ctx.lineWidth,
+                    strokeStyle: this.ctx.strokeStyle,
+                    fillStyle: this.ctx.fillStyle
+                }
             }
         }))
     }
@@ -71,10 +76,14 @@ export default class Line extends Tool {
         }
     }
 
-    static draw(ctx, startX, startY, x, y) {
+    static draw(ctx, {startX, startY, x, y, styles}) {
+        const undoChanges = Tool.changeStyles(ctx, styles)
+
         ctx.beginPath()
         ctx.moveTo(startX, startY)
         ctx.lineTo(x, y)
         ctx.stroke()
+
+        undoChanges()
     }
 }

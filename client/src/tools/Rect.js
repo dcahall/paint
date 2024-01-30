@@ -1,5 +1,5 @@
 import Tool from "./Tool";
-export default class React extends Tool {
+export default class Rect extends Tool {
     isActive = false
     startX = null
     startY = null
@@ -39,6 +39,11 @@ export default class React extends Tool {
                 y: this.startY,
                 width: e.clientX - rect.x - this.startX,
                 height: e.clientY - rect.y - this.startY,
+                styles: {
+                    lineWidth: this.ctx.lineWidth,
+                    strokeStyle: this.ctx.strokeStyle,
+                    fillStyle: this.ctx.fillStyle
+                }
             }
         }))
     }
@@ -70,10 +75,14 @@ export default class React extends Tool {
         }
     }
 
-    static draw(ctx, x, y, width, height) {
+    static draw(ctx, {x, y, width, height, styles}) {
+        const undoChanges = Tool.changeStyles(ctx, styles)
+
         ctx.beginPath()
         ctx.rect(x, y, width, height)
         ctx.fill()
         ctx.stroke()
+
+        undoChanges()
     }
 }

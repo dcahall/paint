@@ -1,4 +1,5 @@
 import Brush from "./Brush";
+import Tool from "./Tool";
 
 export default class Eraser extends Brush {
     constructor(canvas, socket, idSession, idUser) {
@@ -19,28 +20,30 @@ export default class Eraser extends Brush {
                     type: 'eraser',
                     x: e.clientX - rect.x,
                     y: e.clientY - rect.y,
+                    styles: {
+                        lineWidth: this.ctx.lineWidth,
+                    }
                 }
             }))
         }
     }
 
     draw(x, y) {
-        const prevStrokeStyle = this.ctx.strokeStyle
+        const undoChanges = Tool.changeStyles(this.ctx, {strokeStyle: this.ctx.strokeStyle})
 
         this.ctx.lineTo(x, y)
         this.ctx.strokeStyle = '#ffffff'
         this.ctx.stroke()
 
-        this.ctx.strokeStyle = prevStrokeStyle
+        undoChanges()
     }
 
-    static draw(ctx, x, y) {
-        const prevStrokeStyle = ctx.strokeStyle
+    static draw(ctx, {x, y, styles}) {
+        const undoChanges = Tool.changeStyles(ctx, {strokeStyle: '#ffffff', ...styles})
 
         ctx.lineTo(x, y)
-        ctx.strokeStyle = '#ffffff'
         ctx.stroke()
 
-        ctx.strokeStyle = prevStrokeStyle
+        undoChanges()
     }
 }
