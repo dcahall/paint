@@ -50,7 +50,7 @@ export default class Brush extends Tool {
                     y: e.clientY - rect.y,
                     styles: {
                         lineWidth: this.ctx.lineWidth,
-                        strokeStyle: this.ctx.strokeStyle
+                        strokeStyle: this.ctx.fillStyle
                     }
                 }
             }))
@@ -58,8 +58,13 @@ export default class Brush extends Tool {
     }
 
     draw(x, y) {
+        const prevStroke = this.ctx.strokeStyle
+        this.ctx.strokeStyle = this.ctx.fillStyle
+
         this.ctx.lineTo(x, y)
         this.ctx.stroke()
+
+        this.ctx.strokeStyle = prevStroke
     }
 
     static draw(ctx, {x, y, styles}) {

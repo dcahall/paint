@@ -54,6 +54,12 @@ const Canvas = observer(() => {
                     case 'draw':
                         drawHandler(msg.figure)
                         break
+                    case 'undo':
+                        canvasState.undo()
+                        break
+                    case 'redo':
+                        canvasState.redo()
+                        break
                 }
             }
         }
@@ -62,7 +68,7 @@ const Canvas = observer(() => {
     const drawHandler = (figure) => {
         const ctx = canvasRef.current.getContext('2d')
 
-        if (figure.type !== 'brush' || figure.type !== 'eraser') {
+        if (figure.type !== 'brush' && figure.type !== 'eraser' && figure.type !== 'started') {
             canvasState.pushToUndo(canvasState.canvas.toDataURL())
         }
 
@@ -84,6 +90,7 @@ const Canvas = observer(() => {
                 break;
             case 'started':
                 ctx.beginPath()
+                canvasState.pushToUndo(canvasState.canvas.toDataURL())
                 break
         }
     }

@@ -5,6 +5,11 @@ const aWss = WSServer.getWss()
 
 const PORT = process.env.PORT || 5000
 
+
+app.get('/image', function(req, res) {
+    console.dir(req)
+    res.send('About birds');
+})
 app.ws('/', (ws, req) => {
     ws.on('message', (msg) => {
         const message = JSON.parse(msg)
@@ -14,6 +19,12 @@ app.ws('/', (ws, req) => {
                 connectionHandler(ws, message)
                 break
             case 'draw':
+                broadCastConnection(ws, message)
+                break
+            case 'undo':
+                broadCastConnection(ws, message)
+                break
+            case 'redo':
                 broadCastConnection(ws, message)
                 break
         }
@@ -30,10 +41,8 @@ const connectionHandler = (ws, msg) => {
 
 const broadCastConnection = (ws, msg) => {
     aWss.clients.forEach(client => {
-        if (client.idSession === msg.idSession) {
-            if (msg.method === 'connection' || msg.method === 'draw' && msg.idUser !== client.idUser) {
-                client.send(JSON.stringify(msg))
-            }
+        if (client.idSession === msg.idSession && msg.idUser !== client.idUser) {
+            client.send(JSON.stringify(msg))
         }
     })
 }

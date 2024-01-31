@@ -15,7 +15,7 @@ import Line from "../tools/Line";
 
 const Toolbar = () => {
     const {id} = useParams()
-    const [activeTool, setActiveTool] = useState('')
+    const [activeTool, setActiveTool] = useState('Brush')
     const onChangeColor = (color) => {
         toolState.setFillColor('#' + color.toHex())
     }
@@ -41,6 +41,26 @@ const Toolbar = () => {
         return name === active ? 'invert(33%) sepia(4%) saturate(2%) hue-rotate(340deg) brightness(91%) contrast(86%)' : 'none'
     }
 
+    const onUndo = () => {
+        canvasState.undo()
+
+        canvasState.socket.send(JSON.stringify({
+            idSession: canvasState.idSession,
+            idUser: canvasState.idUser,
+            method: 'undo'
+        }))
+    }
+
+    const onRedo = () => {
+        canvasState.redo()
+
+        canvasState.socket.send(JSON.stringify({
+            idSession: canvasState.idSession,
+            idUser: canvasState.idUser,
+            method: 'redo'
+        }))
+    }
+
     return (
         <div className='toolbar'>
             <button
@@ -64,8 +84,8 @@ const Toolbar = () => {
                 style={{filter: getAciveToolStyle('Line', activeTool)}}
                 onClick={() => setTool(Line)}/>
             <ColorPicker defaultValue='black' onChange={onChangeColor} style={{marginLeft: '10px'}}/>
-            <button className='toolbar__btn undo' onClick={() => canvasState.undo()}/>
-            <button className='toolbar__btn redo' onClick={() => canvasState.redo()}/>
+            <button className='toolbar__btn undo' onClick={onUndo}/>
+            <button className='toolbar__btn redo' onClick={onRedo}/>
             <button className='toolbar__btn save' onClick={onSave}/>
         </div>
     );
