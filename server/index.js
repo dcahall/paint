@@ -1,14 +1,39 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
+const fs = require('fs')
+const path = require('path')
+
+
 const WSServer = require('express-ws')(app)
 const aWss = WSServer.getWss()
 
 const PORT = process.env.PORT || 5000
 
+app.use(cors())
+app.use(express.json())
+
+app.post('/image', function (req, res) {
+    try {
+        let data = req.body.img.replace('data:image/png;base64,', '');
+        fs.writeFileSync(path.resolve(__dirname, 'image', `${req.query.id}.png`), data, 'base64')
+
+        res.status(200).json({message: 'Image succesfully saved'})
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({message: 'Error happens'})
+    }
+})
 
 app.get('/image', function(req, res) {
-    console.dir(req)
-    res.send('About birds');
+    try {
+        const img = fs.readFileSync(path.resolve(__dirname, 'image', `${req.query.id}.png`), 'base64')
+
+        res.status(200).json({img: 'data:image/png;base64,' + img})
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({message: 'Error happens'})
+    }
 })
 app.ws('/', (ws, req) => {
     ws.on('message', (msg) => {
