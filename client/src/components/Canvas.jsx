@@ -4,6 +4,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useParams} from "react-router-dom";
 import {observer} from "mobx-react-lite";
 import { v4 as uuidv4 } from 'uuid';
+import axios from "axios";
 
 import canvasState from "../store/canvasState";
 import toolState from "../store/toolState";
@@ -43,6 +44,19 @@ const Canvas = observer(() => {
             canvasState.setIdSession(id)
             canvasState.setSocket(socket)
             toolState.setTool(new Brush(canvasRef.current, socket, id, idUser))
+
+            axios.get(`http://localhost:5000/image?id=${id}`)
+                .then(res => {
+                    const img = new Image()
+                    const ctx = canvasRef.current.getContext('2d')
+
+                    img.src = res.data.img
+                    img.onload = () => {
+                        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+                        ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height)
+                    }
+                })
+                .catch(console.error)
 
             socket.onmessage = e => {
                 const msg = JSON.parse(e.data)
@@ -97,13 +111,23 @@ const Canvas = observer(() => {
 
     const onMouseDown = () => {
         canvasState.pushToUndo(canvasState.canvas.toDataURL())
-    } // Инкапсулировать в tools
+    }
+
+    const onMouseUp = async () => {
+        try {
+            await axios.post(`http://localhost:5000/image?id=${id}`, {img: canvasRef.current.toDataURL()})
+        } catch(e) {
+            console.error(e)
+        }
+
+    }
 
     return (
         <div className='canvas'>
             <StartModal onSubmit={setName}/>
             <canvas
                 onMouseDown={onMouseDown}
+                onMouseUp={onMouseUp}
                 height={600}
                 width={800}
                 ref={canvasRef}

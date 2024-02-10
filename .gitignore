@@ -11,6 +11,11 @@
 # production
 /build
 
+.idea
+/server/image
+/server/node_modules
+/client/node_modules
+
 # misc
 .DS_Store
 .env.local
